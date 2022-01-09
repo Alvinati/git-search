@@ -46,6 +46,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:background="@color/black"
         android:padding="16dp"
+        android:contentDescription="main.layout_search"
         >
 
         <EditText
@@ -70,17 +71,17 @@
             android:clickable="true"
             />
     </RelativeLayout>
+
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="123dp"
+        android:layout_height="21dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="main.label_title"
         android:text="LIST GITHUB USER"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layout_search"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="16dp"
-        android:contentDescription="main.label_title"
-        />
+        app:layout_constraintTop_toBottomOf="@id/layout_search" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_user"
