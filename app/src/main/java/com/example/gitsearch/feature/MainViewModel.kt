@@ -81,8 +81,8 @@ class MainViewModel @Inject constructor(
                 pushState(State.HideLoading)
                 if(result.data.isNotEmpty()) {
                     if(!isLoadMore)
-                        pushState(State.ShowSearchResult(result.data!!))
-                    else pushState(State.LoadMoreResult(result.data!!))
+                        pushState(State.ShowSearchResult(result.data))
+                    else pushState(State.LoadMoreResult(result.data))
                 }
             }
             is Result.Error -> {

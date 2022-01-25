@@ -10,6 +10,8 @@ import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CompletionHandler
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.*
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType.Companion.toMediaType
 import okio.ByteString
 import okio.ByteString.Companion.decodeHex
 import java.io.IOException
@@ -31,7 +33,7 @@ class WebServiceClient @Inject constructor(
             .addHeader("Accept", "application/vnd.github.v3+json")
 
         val baseUrl = BuildConfig.BASE_URL
-        val urlBuilder = HttpUrl.parse(baseUrl + urlSegment)!!.newBuilder()
+        val urlBuilder = (baseUrl + urlSegment).toHttpUrlOrNull()!!.newBuilder()
 
         return Builder(reqBuilder, client, moshi, urlBuilder)
     }
@@ -42,7 +44,7 @@ class WebServiceClient @Inject constructor(
         private val moshi: Moshi,
         private val urlBuilder : HttpUrl.Builder
     ) {
-        private val jsonType = MediaType.get("application/vnd.github.v3+json; charset=utf-8")
+        private val jsonType = "application/vnd.github.v3+json; charset=utf-8".toMediaType()
 
         internal fun addQueryParam(key: String, value: String) : Builder {
             urlBuilder.addQueryParameter(key, value)
@@ -93,13 +95,13 @@ class WebServiceClient @Inject constructor(
         override fun onResponse(call: Call, response: Response) {
 
             if (response.isSuccessful) {
-                val source = response.body()?.source()
+                val source = response.body?.source()
                 source?.request(Long.MAX_VALUE)
                 val buffer = source?.buffer;
                 val body = buffer?.clone()?.readString(Charset.forName("UTF-8"))
 
-                if(body != null && response.code() != 200) {
-                    continuation.resumeWithException(HttpException(response.code(), response.message()))
+                if(body != null && response.code != 200) {
+                    continuation.resumeWithException(HttpException(response.code, response.message))
                 } else {
                     if (source!!.rangeEquals(0, utf8Bom)) {
                         source.skip(utf8Bom.size.toLong())
@@ -118,7 +120,7 @@ class WebServiceClient @Inject constructor(
         }
 
         override fun onFailure(call: Call, ex: IOException) {
-            if (!call.isCanceled)
+            if (!call.isCanceled())
                 continuation.resumeWithException(ex)
         }
 
