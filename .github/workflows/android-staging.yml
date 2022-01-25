@@ -15,32 +15,31 @@ jobs:
         uses: actions/setup-java@v2.5.0
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '11'
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.1.1
         with:
           gradle-version: current
-          wrapper-cache-enabled: true
-          dependencies-cache-enabled: true
-          configuration-cache-enabled: true
           arguments: assembleRelease
 
       - name: Sign Android release
         uses: r0adkll/sign-android-release@v1
         id: sign-app
         with:
-          releaseDirectory: app/build/outputs/apk/ourbuildtype/release
+          releaseDirectory: app/build/outputs/apk/release
           alias: ${{ secrets.KEYALIAS }}
           signingKeyBase64: ${{ secrets.KEYSTORE }}
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "31.0.0"
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
           name: Release artifact
-          path: app/build/outputs/apk/ourbuildtype/release/app-artifact-*.apk
+          path: app/build/outputs/apk/release/app-artifact-*.apk
 
       - name: Create Release
         id: create_release
@@ -53,10 +52,10 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Save name of our Artifact
+      - name: Save name of Artifact
         id: set-result-artifact
         run: |
-          ARTIFACT_PATHNAME_APK=$(ls app/build/outputs/apk/ourbuildtype/release/*.apk | head -n 1)
+          ARTIFACT_PATHNAME_APK=$(ls app/build/outputs/apk/release/*.apk | head -n 1)
           ARTIFACT_NAME_APK=$(basename $ARTIFACT_PATHNAME_APK)
           echo "ARTIFACT_NAME_APK is " ${ARTIFACT_NAME_APK}
           echo "ARTIFACT_PATHNAME_APK=${ARTIFACT_PATHNAME_APK}" >> $GITHUB_ENV
