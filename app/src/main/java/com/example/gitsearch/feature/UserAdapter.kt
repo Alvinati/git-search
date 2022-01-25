@@ -29,7 +29,6 @@ class UserAdapter(private val context: Context, private val dataset: MutableList
     fun addLoad() {
         if(dataset.find { it.id == 0L } != null)
             return
-
         dataset.add(User(0, "", "", ""))
         notifyItemInserted(dataset.size)
     }
